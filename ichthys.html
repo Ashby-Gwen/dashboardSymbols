@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ichthys Symbol - Canvas</title>
+    <style>
+        /* Ensure the document and body are completely transparent and take up the full container/viewport */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: transparent !important;
+        }
+
+        #canvasContainer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        canvas {
+            display: block;
+            background: transparent;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvasContainer">
+        <canvas id="ichthysCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('ichthysCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- CUSTOMIZATION CONFIGURATION ---
+        // Change these values to customize the look in your system
+        const config = {
+            strokeColorStart: '#2c3e50',  // Gradient start color (Dark slate)
+            strokeColorEnd: '#3498db',    // Gradient end color (Bright blue)
+            thicknessRatio: 0.03,         // Line thickness relative to canvas size
+            intersectionAngle: 18,        // Curve rotation angle (determines overlap of tail)
+            shadowColor: 'rgba(0, 0, 0, 0.15)', // Shadow color
+            shadowBlur: 10,               // Blur intensity
+            shadowOffsetX: 3,             // Horizontal shadow offset
+            shadowOffsetY: 4              // Vertical shadow offset
+        };
+
+        function drawIchthys() {
+            // Get the display bounds of the container
+            const rect = canvas.getBoundingClientRect();
+            
+            // Adjust for High-DPI / Retina screens to avoid any blurriness
+            const scale = window.devicePixelRatio || 1;
+            canvas.width = rect.width * scale;
+            canvas.height = rect.height * scale;
+            
+            // Normalize context scaling back to css pixels
+            ctx.scale(scale, scale);
+            
+            const w = rect.width;
+            const h = rect.height;
+
+            // Clear the canvas cleanly (maintains transparency)
+            ctx.clearRect(0, 0, w, h);
+
+            // Styling properties
+            ctx.lineWidth = Math.min(w, h) * config.thicknessRatio;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Create a smooth gradient sweeping across the symbol
+            const gradient = ctx.createLinearGradient(0, 0, w, h);
+            gradient.addColorStop(0, config.strokeColorStart);
+            gradient.addColorStop(1, config.strokeColorEnd);
+            ctx.strokeStyle = gradient;
+
+            // Optional Drop Shadow
+            ctx.shadowColor = config.shadowColor;
+            ctx.shadowBlur = config.shadowBlur;
+            ctx.shadowOffsetX = config.shadowOffsetX;
+            ctx.shadowOffsetY = config.shadowOffsetY;
+
+            // Calculate control points based on desired overlap angle
+            const angleFactor = config.intersectionAngle / 18; 
+            const topYControl = h * (0.5 - 0.4 * angleFactor);
+            const bottomYControl = h * (0.5 + 0.4 * angleFactor);
+
+            ctx.beginPath();
+
+            // 1. Top Arc (Nose -> Curves upward -> Bottom Right Tail)
+            ctx.moveTo(w * 0.15, h * 0.5);
+            ctx.bezierCurveTo(
+                w * 0.35, topYControl,
+                w * 0.65, topYControl,
+                w * 0.85, h * (0.5 + 0.25 * angleFactor)
+            );
+
+            // 2. Bottom Arc (Nose -> Curves downward -> Top Right Tail)
+            ctx.moveTo(w * 0.15, h * 0.5);
+            ctx.bezierCurveTo(
+                w * 0.35, bottomYControl,
+                w * 0.65, bottomYControl,
+                w * 0.85, h * (0.5 - 0.25 * angleFactor)
+            );
+
+            // Render the curves onto the transparent canvas
+            ctx.stroke();
+        }
+
+        // Run render initially
+        drawIchthys();
+
+        // Keep it responsive and pixel-perfect during viewport/container changes
+        window.addEventListener('resize', drawIchthys);
+    </script>
+</body>
+</html>
