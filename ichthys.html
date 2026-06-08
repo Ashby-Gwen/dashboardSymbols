@@ -13,11 +13,18 @@
             height: 100%;
             overflow: hidden;
             background-color: transparent !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Set a strict square container that scales fluidly within the viewport bounds */
         #canvasContainer {
             width: 100%;
             height: 100%;
+            max-width: 100vmin;
+            max-height: 100vmin;
+            aspect-ratio: 1 / 1;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -29,8 +36,6 @@
             background: transparent;
             width: 100%;
             height: 100%;
-            max-width: 100%;
-            max-height: 100%;
         }
     </style>
 </head>
